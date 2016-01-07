@@ -18,111 +18,120 @@ macro_rules! try_opt {
 }
 
 pub struct DynamoDBHelper<'a> {
-	client: DynamoDBClient<'a>
+    client: DynamoDBClient<'a>,
 }
 
 impl<'a> DynamoDBHelper<'a> {
-	pub fn new<P: AWSCredentialsProvider + 'a>(credentials: P, region:&'a Region) -> DynamoDBHelper<'a> {
-		DynamoDBHelper { client: DynamoDBClient::new(credentials, region) }
-	}
+    pub fn new<P: AWSCredentialsProvider + 'a>(credentials: P,
+                                               region: &'a Region)
+                                               -> DynamoDBHelper<'a> {
+        DynamoDBHelper { client: DynamoDBClient::new(credentials, region) }
+    }
 
-	pub fn list_tables(&mut self) -> Result<ListTablesOutput> {
-		let mut req = ListTablesInput::default();
-		self.client.list_tables(&req)
-	}
+    pub fn list_tables(&mut self) -> Result<ListTablesOutput> {
+        let mut req = ListTablesInput::default();
+        self.client.list_tables(&req)
+    }
 
-	pub fn create_table(&mut self, input: &CreateTableInput) -> Result<CreateTableOutput> {
-		self.client.create_table(input)
-	}
+    pub fn create_table(&mut self, input: &CreateTableInput) -> Result<CreateTableOutput> {
+        self.client.create_table(input)
+    }
 
-	pub fn describe_table(&mut self, name: &str) -> Result<DescribeTableOutput> {
-		let mut input = DescribeTableInput::default();
-		input.TableName = String::from(name);
-		self.client.describe_table(&input)
-	}
+    pub fn describe_table(&mut self, name: &str) -> Result<DescribeTableOutput> {
+        let mut input = DescribeTableInput::default();
+        input.TableName = String::from(name);
+        self.client.describe_table(&input)
+    }
 
-	pub fn delete_table(&mut self, name: &str) -> Result<DeleteTableOutput> {
-		let mut input = DeleteTableInput::default();
-		input.TableName = String::from(name);
-		self.client.delete_table(&input)
-	}
+    pub fn delete_table(&mut self, name: &str) -> Result<DeleteTableOutput> {
+        let mut input = DeleteTableInput::default();
+        input.TableName = String::from(name);
+        self.client.delete_table(&input)
+    }
 
-	pub fn put_item(&mut self, input: &PutItemInput) -> Result<PutItemOutput> {
-		self.client.put_item(input)
-	}
+    pub fn put_item(&mut self, input: &PutItemInput) -> Result<PutItemOutput> {
+        self.client.put_item(input)
+    }
 
     pub fn get_item(&mut self, input: &GetItemInput) -> Result<GetItemOutput> {
-		self.client.get_item(input)
-	}
-
+        self.client.get_item(input)
+    }
 }
 
 pub trait PutItemInputHelper {
-	fn new() -> PutItemInput;
+    fn new() -> PutItemInput;
 }
 
 impl PutItemInputHelper for PutItemInput {
-	 fn new() -> PutItemInput {
-		PutItemInput::default()
-	}
+    fn new() -> PutItemInput {
+        PutItemInput::default()
+    }
 }
 
 pub trait CreateTableInputHelper {
-	fn new() -> CreateTableInput;
-	fn with_name(mut self, table_name: &str) -> CreateTableInput;
-	fn with_write_capacity(mut self, write_capacity: PositiveLongObject) -> CreateTableInput;
-	fn with_read_capacity(mut self, read_capacity: PositiveLongObject) -> CreateTableInput;
-	fn with_attributes(mut self, attributes: Vec<AttributeDefinition>) -> CreateTableInput;
-	fn with_key_schema(mut self, key_schema: Vec<KeySchemaElement>) -> CreateTableInput;
-	fn add_attribute<N: Into<String>, T: Into<String>>(mut self, name: N, attr_type: T) -> CreateTableInput;
+    fn new() -> CreateTableInput;
+    fn with_name(mut self, table_name: &str) -> CreateTableInput;
+    fn with_write_capacity(mut self, write_capacity: PositiveLongObject) -> CreateTableInput;
+    fn with_read_capacity(mut self, read_capacity: PositiveLongObject) -> CreateTableInput;
+    fn with_attributes(mut self, attributes: Vec<AttributeDefinition>) -> CreateTableInput;
+    fn with_key_schema(mut self, key_schema: Vec<KeySchemaElement>) -> CreateTableInput;
+    fn add_attribute<N: Into<String>, T: Into<String>>(mut self,
+                                                       name: N,
+                                                       attr_type: T)
+                                                       -> CreateTableInput;
 }
 
 impl CreateTableInputHelper for CreateTableInput {
-	fn new() -> CreateTableInput {
-		CreateTableInput::default()
-	}
+    fn new() -> CreateTableInput {
+        CreateTableInput::default()
+    }
 
-	fn with_name(mut self, table_name: &str) -> CreateTableInput {
-		self.TableName = String::from(table_name);
-		self
-	}
+    fn with_name(mut self, table_name: &str) -> CreateTableInput {
+        self.TableName = String::from(table_name);
+        self
+    }
 
-	fn with_write_capacity(mut self, write_capacity: PositiveLongObject) -> CreateTableInput {
-		self.ProvisionedThroughput.WriteCapacityUnits = write_capacity;
-		self
-	}
+    fn with_write_capacity(mut self, write_capacity: PositiveLongObject) -> CreateTableInput {
+        self.ProvisionedThroughput.WriteCapacityUnits = write_capacity;
+        self
+    }
 
-	fn with_read_capacity(mut self, read_capacity: PositiveLongObject) -> CreateTableInput {
-		self.ProvisionedThroughput.ReadCapacityUnits = read_capacity;
-		self
-	}
+    fn with_read_capacity(mut self, read_capacity: PositiveLongObject) -> CreateTableInput {
+        self.ProvisionedThroughput.ReadCapacityUnits = read_capacity;
+        self
+    }
 
-	fn with_attributes(mut self, attributes: Vec<AttributeDefinition>) -> CreateTableInput {
-		self.AttributeDefinitions = attributes;
-		self
-	}
+    fn with_attributes(mut self, attributes: Vec<AttributeDefinition>) -> CreateTableInput {
+        self.AttributeDefinitions = attributes;
+        self
+    }
 
-	fn with_key_schema(mut self, key_schema: Vec<KeySchemaElement>) -> CreateTableInput {
-		self.KeySchema = key_schema;
-		self
-	}
+    fn with_key_schema(mut self, key_schema: Vec<KeySchemaElement>) -> CreateTableInput {
+        self.KeySchema = key_schema;
+        self
+    }
 
-	fn add_attribute<N: Into<String>, T: Into<String>>(mut self, name: N, attr_type: T) -> CreateTableInput {
-		self.AttributeDefinitions.push(AttributeDefinition { AttributeName: name.into(), AttributeType: attr_type.into() });
-		self
-	}
-
+    fn add_attribute<N: Into<String>, T: Into<String>>(mut self,
+                                                       name: N,
+                                                       attr_type: T)
+                                                       -> CreateTableInput {
+        self.AttributeDefinitions.push(AttributeDefinition {
+            AttributeName: name.into(),
+            AttributeType: attr_type.into(),
+        });
+        self
+    }
 }
 
 pub trait DescribeTableOutputHelper {
-	fn get_status(&self) -> Option<String>;
+    fn get_status(&self) -> Option<String>;
 }
 
 impl DescribeTableOutputHelper for DescribeTableOutput {
-	fn get_status(&self) -> Option<String> {
-		let table = try_opt!(self.Table);
-		Some(try_opt!(table.TableStatus).to_string())
-	}
+    fn get_status(&self) -> Option<String> {
+        let table = try_opt!(self.Table);
+        Some(try_opt!(table.TableStatus).to_string())
+    }
 }
 
 
@@ -198,4 +207,3 @@ pub fn get_str_from_attribute(attr: &AttributeValue) -> Option<&str> {
 
     return None;
 }
-

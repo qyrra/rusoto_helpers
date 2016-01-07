@@ -2,18 +2,19 @@
 #[macro_use]
 extern crate rusoto;
 #[macro_use]
-extern crate rusoto_helper;
-//extern crate xml;
+extern crate rusoto_helpers;
+// extern crate xml;
 extern crate time;
-//extern crate regex;
-//extern crate rustc_serialize;
+// extern crate regex;
+// extern crate rustc_serialize;
 
 use rusoto::credentials::*;
 use rusoto::regions::*;
 use rusoto::dynamodb::{CreateTableInput, AttributeDefinition, KeySchemaElement};
 use rusoto::dynamodb::{DynamoDBError, PutItemInput, PutItemInputAttributeMap, AttributeValue};
 use rusoto::dynamodb::{GetItemInput, GetItemOutput, Key};
-use rusoto_helper::dynamodb::{DynamoDBHelper, get_str_from_attribute, CreateTableInputHelper, DescribeTableOutputHelper};
+use rusoto_helpers::dynamodb::{DynamoDBHelper, get_str_from_attribute, CreateTableInputHelper,
+                               DescribeTableOutputHelper};
 use std::thread;
 use time::*;
 
@@ -65,11 +66,13 @@ fn main() {
                 None => println!("nothing received from Dynamo, item may not exist"),
                 Some(attributes_map) => {
                     for (column_name, value) in attributes_map {
-                        println!("found column name '{}' with value of '{}'", column_name, get_str_from_attribute(&value).unwrap());
+                        println!("found column name '{}' with value of '{}'",
+                                 column_name,
+                                 get_str_from_attribute(&value).unwrap());
                     }
-                },
+                }
             }
-        },
+        }
         Err(err) => {
             println!("Error retrieving object: {:?}", err);
         }
@@ -95,11 +98,13 @@ fn main() {
                 None => println!("nothing received from Dynamo, item may not exist"),
                 Some(attributes_map) => {
                     for (column_name, value) in attributes_map {
-                        println!("found column name '{}' with value of '{}'", column_name, get_str_from_attribute(&value).unwrap());
+                        println!("found column name '{}' with value of '{}'",
+                                 column_name,
+                                 get_str_from_attribute(&value).unwrap());
                     }
-                },
+                }
             }
-        },
+        }
         Err(err) => {
             println!("Error retrieving object: {:?}", err);
         }
@@ -128,17 +133,19 @@ fn dynamo_create_table_test(dynamodb: &mut DynamoDBHelper,
     println!("Creating table {} ", table_name);
 
     let input = CreateTableInput::new()
-                        .with_name(table_name)
-                        .with_write_capacity(1)
-                        .with_read_capacity(1)
-                        .with_attributes(attributes!("string" => "S", "number" => "N"))
-                        .with_key_schema(key_schema!("string" => "HASH", "number" => "RANGE"));
+                    .with_name(table_name)
+                    .with_write_capacity(1)
+                    .with_read_capacity(1)
+                    .with_attributes(attributes!("string" => "S", "number" => "N"))
+                    .with_key_schema(key_schema!("string" => "HASH", "number" => "RANGE"));
 
     let _result = try!(dynamodb.create_table(&input));
     Ok(())
 }
 
-fn dynamo_put_item_test(dynamodb: &mut DynamoDBHelper, table_name: &str) -> Result<(), DynamoDBError> {
+fn dynamo_put_item_test(dynamodb: &mut DynamoDBHelper,
+                        table_name: &str)
+                        -> Result<(), DynamoDBError> {
     let mut input = PutItemInput::default();
 
     let mut item = PutItemInputAttributeMap::default();
@@ -153,7 +160,10 @@ fn dynamo_put_item_test(dynamodb: &mut DynamoDBHelper, table_name: &str) -> Resu
     Ok(())
 }
 
-fn dynamo_get_item_test(dynamodb: &mut DynamoDBHelper, table_name: &str, item_key: Key) -> Result<GetItemOutput, DynamoDBError> {
+fn dynamo_get_item_test(dynamodb: &mut DynamoDBHelper,
+                        table_name: &str,
+                        item_key: Key)
+                        -> Result<GetItemOutput, DynamoDBError> {
     let mut item_request = GetItemInput::default();
     item_request.Key = item_key;
     item_request.TableName = table_name.to_string();

@@ -1,13 +1,15 @@
 [package]
-name = "rusoto_helper"
+name = "rusoto_helpers"
 version = "0.1.0"
 authors = ["Anthony DiMarco <ocramida@gmail.com>"]
 
 [dependencies]
-rusoto = { git = "https://github.com/rusoto/rusoto.git", branch = "feature-split-crates" }
+#rusoto = { git = "https://github.com/rusoto/rusoto.git", branch = "feature-split-crates" }
+rusoto = { path = "../rusoto" }
 rustc-serialize = "^0.3.16"
 time = "^0.1.32"
 
 [features]
-aws_integration = ["dynamodb"]
+aws_integration = ["dynamodb", "sqs"]
 dynamodb = []
+sqs = []
